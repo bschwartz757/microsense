@@ -1,0 +1,101 @@
+<div class="card-header w-100 d-flex justify-content-between align-items-center weather-app-card__header">
+  <div on:click="handleSearch()">
+    <i class="fas fa-search"></i>
+  </div>
+  <div class="w-75">
+    <form on:submit="handleSubmit(event)">
+      <div class="form-group">
+        <input type="text" class="form-control card-header__input" aria-describedby="searchHelp" on:change="handleChange()" placeholder="Search for a city...">
+        <small id="searchHelp" class="form-text text-muted" hidden>Please enter a city to search</small>
+      </div>
+    </form>
+  </div>
+  <div on:click="handleCancel()">
+    <i class="fas fa-times"></i>
+  </div>
+</div>
+
+<hr>
+
+<script>
+  import fontawesome from "@fortawesome/fontawesome";
+  import { faSearch, faTimes } from "@fortawesome/fontawesome-free-solid";
+
+  fontawesome.library.add(faSearch, faTimes);
+
+  export default {
+    methods: {
+      handleChange(str = undefined) {
+        const input = document.querySelector('.card-header__input');
+        if (str === 'reset') {
+          input.value = '';
+        }
+        this.set({
+          city: input.value.split(', ')[0]
+        });
+      },
+      handleSearch() {
+        this.handleChange();
+      },
+      handleCancel() {
+        this.handleChange('reset');
+      },
+      handleSubmit(evt) {
+        // prevent form submit on <enter> keydown
+        evt.preventDefault();
+        return false;
+      }
+    }
+  };
+</script>
+
+<style>
+  .weather-app-card__header {
+    background-color: transparent;
+    border-bottom: none;
+    z-index: 500;
+  }
+
+  .card>hr {
+    margin: 0 1rem;
+  }
+
+  .form-control {
+    color: white;
+    font-size: 1.5rem;
+    background-color: transparent;
+    border: none;
+  }
+
+  .fa-search,
+  .fa-times {
+    color: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+
+  .form-control:focus {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  input::-webkit-input-placeholder {
+    /* Chrome/Opera/Safari */
+    color: white;
+  }
+
+  input::-moz-placeholder {
+    /* Firefox 19+ */
+    color: white;
+  }
+
+  input:-ms-input-placeholder {
+    /* IE 10+ */
+    color: white;
+  }
+
+  input:-moz-placeholder {
+    /* Firefox 18- */
+    color: white;
+  }
+</style>

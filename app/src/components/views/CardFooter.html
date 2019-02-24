@@ -1,0 +1,103 @@
+{#if !forecast.length}
+<div class="card-footer d-flex justify-content-center weather-app-card__footer" transition:fade>
+  <div class="col-6 text-center">
+    <h1>No Forecast Data</h1>
+  </div>
+</div>
+<style>
+  .weather-app-card__footer {
+    color: #888;
+    background: white;
+    padding: 1rem 0;
+    border-radius: 0 0 4px 4px;
+  }
+</style>
+{:elseif forecast[0] === 'City not found'}
+<div class="card-footer d-flex justify-content-center weather-app-card__footer" transition:fade>
+  <div class="col-6 text-center">
+    <h1>{forecast[0]}</h1>
+  </div>
+</div>
+<style>
+  .weather-app-card__footer {
+    color: #888;
+    background: white;
+    padding: 1rem 0;
+    border-radius: 0 0 4px 4px;
+  }
+</style>
+{:else}
+<div class="card-footer w-100 d-flex weather-app-card__footer" transition:fade>
+  {#each forecast as forecasts}
+  <div class="d-flex flex-column text-center card-footer__forecast-item">
+    <span class="forecast-item__date">{forecasts.date}</span>
+    <span class="forecast-item__symbol">
+      <img src="http://openweathermap.org/img/w/{forecasts.conditions.icon}.png" alt="weather icon">
+    </span>
+    <span class="forecast-item__temp--f">{forecasts.temp.f}
+      <sup class="weather-card__degree-symbol">&deg;</sup>F
+    </span>
+    <span class="forecast-item__temp--c">{forecasts.temp.c}
+      <sup class="weather-card__degree-symbol">&deg;</sup>C
+    </span>
+  </div>
+  {/each}
+</div>
+<style>
+  .weather-app-card__footer {
+    background: white;
+    padding: 1rem 0;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .card-footer__forecast-item {
+    color: gray;
+    border-right: 1px solid lightgray;
+    width: 20%;
+  }
+
+  .forecast-item__date {
+    color: #888;
+  }
+
+  .forecast-item__temp--f {
+    color: navy;
+    font-size: 1.2em;
+    font-weight: bolder;
+  }
+
+  .forecast-item__temp--c {
+    color: #888;
+    font-size: .8em;
+    margin-top: .25em;
+  }
+
+  .card-footer__forecast-item span {
+    margin: .5em 0;
+  }
+
+  .card-footer__forecast-item:last-child {
+    border-right: none;
+  }
+</style>
+{/if}
+
+<script>
+  import { fade } from 'svelte-transitions';
+  import { cubicInOut } from 'eases-jsnext';
+
+  export default {
+    transitions: {
+      fade(node, { delay = 0, duration = 400 }) {
+        const o = +getComputedStyle(node).opacity;
+
+        return {
+          delay,
+          duration,
+          easing: cubicInOut,
+          css: t => `opacity: ${t * o}`
+        };
+      }
+    }
+  };
+</script>

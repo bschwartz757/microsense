@@ -1,0 +1,53 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Mock api for ItemSense UI Team's take-home project",
+  "license": "MIT",
+  "author": "Blake Schwartz",
+  "main": "app/public/js/bundle.js",
+  "module": "app/public/js/bundle.es.js",
+  "scripts": {
+    "build": "cd app && rollup -c",
+    "dev": "serve public & rollup -c -w",
+    "start": "npm run build && node server.js"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": [],
+    "env": {
+      "es6": true
+    },
+    "plugins": [],
+    "parserOptions": {
+      "sourceType": "module",
+      "allowImportExportEverywhere": true
+    },
+    "rules": {
+      "space-before-function-paren": 0,
+      "import/first": 0
+    }
+  },
+  "browserslist": [
+    "last 1 version",
+    "> 1% in US"
+  ],
+  "devDependencies": {
+    "eslint-config-standard": "^12.0.0",
+    "eslint-config-standard-react": "^7.0.2",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "rollup": "^1.2.3",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-svelte": "^5.0.3",
+    "serve": "^10.1.2",
+    "svelte": "^2.0.0"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
