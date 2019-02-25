@@ -14,7 +14,7 @@ app.use(function(req, res) {
 });
 
 //500 error handler (middleware)
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
   res.status(500).render("500");
 });
 
