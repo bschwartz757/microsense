@@ -1,4 +1,5 @@
 // Wrapper around fetch - allows for more flexibility
+import { apiHost } from "../config";
 const apiCall = async ({ route, method, payload = undefined }) => {
   const config = {
     method: method,
@@ -15,7 +16,7 @@ const apiCall = async ({ route, method, payload = undefined }) => {
   }
 
   try {
-    return await fetch(`http://localhost:3000/${route}`, config)
+    return await fetch(`${apiHost}/${route}`, config)
       .then(res => res.json())
       .then(result => result);
   } catch (err) {
