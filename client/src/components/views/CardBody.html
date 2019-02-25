@@ -2,20 +2,35 @@
   <div class="d-flex flex-column card-content__data">
     <!-- <h3>No Data</h3> -->
     <ul class="list-group">
-      <li class="list-group-item">Cras justo odio</li>
-      <li class="list-group-item">Dapibus ac facilisis in</li>
-      <li class="list-group-item">Morbi leo risus</li>
-      <li class="list-group-item">Porta ac consectetur ac</li>
-      <li class="list-group-item">Vestibulum at eros</li>
+      <!-- <li class="list-group-item">{$readers}</li> -->
+
+      <!-- {#each readers as reader}
+        <li class="list-group-item">{reader.name} - {reader.type} - {reader.address}</li>
+      {:else}
+        <li class="list-group-item">No readers</li>
+      {/each} -->
     </ul>
   </div>
 </div>
 
 <script>
+
   import { fade } from 'svelte-transitions';
   import { cubicInOut } from 'eases-jsnext';
 
   export default {
+    data() {
+      return {
+        readers: []
+      }
+    },
+    oncreate() {
+      const { readers } = this.store.get()
+      this.set({
+        readers: readers
+      })
+      console.log('this: ', this)
+    },
     transitions: {
       fade(node, { delay = 0, duration = 400 }) {
         const o = +getComputedStyle(node).opacity;

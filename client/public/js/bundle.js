@@ -8,6 +8,11 @@ var app = (function() {
     return tar;
   }
 
+  function assignTrue(tar, src) {
+    for (var k in src) tar[k] = 1;
+    return tar;
+  }
+
   function addLoc(element, file, line, column, char) {
     element.__svelte_meta = {
       loc: { file, line, column, char }
@@ -201,173 +206,6 @@ var app = (function() {
     _mount,
     _differs
   };
-
-  function Store(state, options) {
-    this._handlers = {};
-    this._dependents = [];
-
-    this._computed = blankObject();
-    this._sortedComputedProperties = [];
-
-    this._state = assign({}, state);
-    this._differs = options && options.immutable ? _differsImmutable : _differs;
-  }
-
-  assign(Store.prototype, {
-    _add(component, props) {
-      this._dependents.push({
-        component: component,
-        props: props
-      });
-    },
-
-    _init(props) {
-      const state = {};
-      for (let i = 0; i < props.length; i += 1) {
-        const prop = props[i];
-        state["$" + prop] = this._state[prop];
-      }
-      return state;
-    },
-
-    _remove(component) {
-      let i = this._dependents.length;
-      while (i--) {
-        if (this._dependents[i].component === component) {
-          this._dependents.splice(i, 1);
-          return;
-        }
-      }
-    },
-
-    _set(newState, changed) {
-      const previous = this._state;
-      this._state = assign(assign({}, previous), newState);
-
-      for (let i = 0; i < this._sortedComputedProperties.length; i += 1) {
-        this._sortedComputedProperties[i].update(this._state, changed);
-      }
-
-      this.fire("state", {
-        changed,
-        previous,
-        current: this._state
-      });
-
-      this._dependents
-        .filter(dependent => {
-          const componentState = {};
-          let dirty = false;
-
-          for (let j = 0; j < dependent.props.length; j += 1) {
-            const prop = dependent.props[j];
-            if (prop in changed) {
-              componentState["$" + prop] = this._state[prop];
-              dirty = true;
-            }
-          }
-
-          if (dirty) {
-            dependent.component._stage(componentState);
-            return true;
-          }
-        })
-        .forEach(dependent => {
-          dependent.component.set({});
-        });
-
-      this.fire("update", {
-        changed,
-        previous,
-        current: this._state
-      });
-    },
-
-    _sortComputedProperties() {
-      const computed = this._computed;
-      const sorted = (this._sortedComputedProperties = []);
-      const visited = blankObject();
-      let currentKey;
-
-      function visit(key) {
-        const c = computed[key];
-
-        if (c) {
-          c.deps.forEach(dep => {
-            if (dep === currentKey) {
-              throw new Error(
-                `Cyclical dependency detected between ${dep} <-> ${key}`
-              );
-            }
-
-            visit(dep);
-          });
-
-          if (!visited[key]) {
-            visited[key] = true;
-            sorted.push(c);
-          }
-        }
-      }
-
-      for (const key in this._computed) {
-        visit((currentKey = key));
-      }
-    },
-
-    compute(key, deps, fn) {
-      let value;
-
-      const c = {
-        deps,
-        update: (state, changed, dirty) => {
-          const values = deps.map(dep => {
-            if (dep in changed) dirty = true;
-            return state[dep];
-          });
-
-          if (dirty) {
-            const newValue = fn.apply(null, values);
-            if (this._differs(newValue, value)) {
-              value = newValue;
-              changed[key] = true;
-              state[key] = value;
-            }
-          }
-        }
-      };
-
-      this._computed[key] = c;
-      this._sortComputedProperties();
-
-      const state = assign({}, this._state);
-      const changed = {};
-      c.update(state, changed, true);
-      this._set(state, changed);
-    },
-
-    fire,
-
-    get,
-
-    on,
-
-    set(newState) {
-      const oldState = this._state;
-      const changed = (this._changed = {});
-      let dirty = false;
-
-      for (const key in newState) {
-        if (this._computed[key])
-          throw new Error(`'${key}' is a read-only computed property`);
-        if (this._differs(newState[key], oldState[key]))
-          changed[key] = dirty = true;
-      }
-      if (!dirty) return;
-
-      this._set(newState, changed);
-    }
-  });
 
   /*!
    * Font Awesome Free 5.0.13 by @fontawesome - https://fontawesome.com
@@ -2542,17 +2380,6 @@ var app = (function() {
       this.set({
         city: input.value.split(", ")[0]
       });
-    },
-    handleSearch() {
-      this.handleChange();
-    },
-    handleCancel() {
-      this.handleChange("reset");
-    },
-    handleSubmit(evt) {
-      // prevent form submit on <enter> keydown
-      evt.preventDefault();
-      return false;
     }
   };
 
@@ -2560,9 +2387,9 @@ var app = (function() {
 
   function add_css() {
     var style = createElement("style");
-    style.id = "svelte-uixapf-style";
+    style.id = "svelte-30j8po-style";
     style.textContent =
-      ".ui-card__header.svelte-uixapf{background-color:transparent;border-bottom:none;z-index:500}.card>hr.svelte-uixapf{margin:0 1rem}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ2FyZEhlYWRlci5odG1sIiwic291cmNlcyI6WyJDYXJkSGVhZGVyLmh0bWwiXSwic291cmNlc0NvbnRlbnQiOlsiPGRpdiBjbGFzcz1cImNhcmQtaGVhZGVyIHctMTAwIGQtZmxleCBqdXN0aWZ5LWNvbnRlbnQtY2VudGVyIGFsaWduLWNvbnRlbnQtY2VudGVyIHVpLWNhcmRfX2hlYWRlclwiPlxuXG4gIDxoMT5ObyBEYXRhPC9oMT5cblxuXG48L2Rpdj5cblxuPGhyPlxuXG48c2NyaXB0PlxuICBpbXBvcnQgZm9udGF3ZXNvbWUgZnJvbSBcIkBmb3J0YXdlc29tZS9mb250YXdlc29tZVwiO1xuICBpbXBvcnQgeyBmYVNlYXJjaCwgZmFUaW1lcyB9IGZyb20gXCJAZm9ydGF3ZXNvbWUvZm9udGF3ZXNvbWUtZnJlZS1zb2xpZFwiO1xuXG4gIGZvbnRhd2Vzb21lLmxpYnJhcnkuYWRkKGZhU2VhcmNoLCBmYVRpbWVzKTtcblxuICBleHBvcnQgZGVmYXVsdCB7XG4gICAgbWV0aG9kczoge1xuICAgICAgaGFuZGxlQ2hhbmdlKHN0ciA9IHVuZGVmaW5lZCkge1xuICAgICAgICBjb25zdCBpbnB1dCA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJy5jYXJkLWhlYWRlcl9faW5wdXQnKTtcbiAgICAgICAgaWYgKHN0ciA9PT0gJ3Jlc2V0Jykge1xuICAgICAgICAgIGlucHV0LnZhbHVlID0gJyc7XG4gICAgICAgIH1cbiAgICAgICAgdGhpcy5zZXQoe1xuICAgICAgICAgIGNpdHk6IGlucHV0LnZhbHVlLnNwbGl0KCcsICcpWzBdXG4gICAgICAgIH0pO1xuICAgICAgfSxcbiAgICAgIGhhbmRsZVNlYXJjaCgpIHtcbiAgICAgICAgdGhpcy5oYW5kbGVDaGFuZ2UoKTtcbiAgICAgIH0sXG4gICAgICBoYW5kbGVDYW5jZWwoKSB7XG4gICAgICAgIHRoaXMuaGFuZGxlQ2hhbmdlKCdyZXNldCcpO1xuICAgICAgfSxcbiAgICAgIGhhbmRsZVN1Ym1pdChldnQpIHtcbiAgICAgICAgLy8gcHJldmVudCBmb3JtIHN1Ym1pdCBvbiA8ZW50ZXI+IGtleWRvd25cbiAgICAgICAgZXZ0LnByZXZlbnREZWZhdWx0KCk7XG4gICAgICAgIHJldHVybiBmYWxzZTtcbiAgICAgIH1cbiAgICB9XG4gIH07XG48L3NjcmlwdD5cblxuPHN0eWxlPlxuICAudWktY2FyZF9faGVhZGVyIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDtcbiAgICBib3JkZXItYm90dG9tOiBub25lO1xuICAgIHotaW5kZXg6IDUwMDtcbiAgfVxuXG4gIC5jYXJkPmhyIHtcbiAgICBtYXJnaW46IDAgMXJlbTtcbiAgfVxuXG4gIC5mb3JtLWNvbnRyb2wge1xuICAgIGNvbG9yOiB3aGl0ZTtcbiAgICBmb250LXNpemU6IDEuNXJlbTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudDtcbiAgICBib3JkZXI6IG5vbmU7XG4gIH1cblxuICAuZmEtc2VhcmNoLFxuICAuZmEtdGltZXMge1xuICAgIGNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuNCk7XG4gICAgY3Vyc29yOiBwb2ludGVyO1xuICB9XG5cbiAgLmZvcm0tY29udHJvbDpmb2N1cyB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7XG4gICAgYm9yZGVyLWNvbG9yOiB0cmFuc3BhcmVudDtcbiAgICBib3gtc2hhZG93OiBub25lO1xuICB9XG5cbiAgaW5wdXQ6Oi13ZWJraXQtaW5wdXQtcGxhY2Vob2xkZXIge1xuICAgIC8qIENocm9tZS9PcGVyYS9TYWZhcmkgKi9cbiAgICBjb2xvcjogd2hpdGU7XG4gIH1cblxuICBpbnB1dDo6LW1vei1wbGFjZWhvbGRlciB7XG4gICAgLyogRmlyZWZveCAxOSsgKi9cbiAgICBjb2xvcjogd2hpdGU7XG4gIH1cblxuICBpbnB1dDotbXMtaW5wdXQtcGxhY2Vob2xkZXIge1xuICAgIC8qIElFIDEwKyAqL1xuICAgIGNvbG9yOiB3aGl0ZTtcbiAgfVxuXG4gIGlucHV0Oi1tb3otcGxhY2Vob2xkZXIge1xuICAgIC8qIEZpcmVmb3ggMTgtICovXG4gICAgY29sb3I6IHdoaXRlO1xuICB9XG48L3N0eWxlPiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUEwQ0UsZ0JBQWdCLGNBQUMsQ0FBQyxBQUNoQixnQkFBZ0IsQ0FBRSxXQUFXLENBQzdCLGFBQWEsQ0FBRSxJQUFJLENBQ25CLE9BQU8sQ0FBRSxHQUFHLEFBQ2QsQ0FBQyxBQUVELEtBQUssQ0FBQyxFQUFFLGNBQUMsQ0FBQyxBQUNSLE1BQU0sQ0FBRSxDQUFDLENBQUMsSUFBSSxBQUNoQixDQUFDIn0= */";
+      ".ui-card__header.svelte-30j8po{background-color:transparent;border-bottom:none;z-index:500}.card>hr.svelte-30j8po{margin:0 1rem}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQ2FyZEhlYWRlci5odG1sIiwic291cmNlcyI6WyJDYXJkSGVhZGVyLmh0bWwiXSwic291cmNlc0NvbnRlbnQiOlsiPGRpdiBjbGFzcz1cImNhcmQtaGVhZGVyIHctMTAwIGQtZmxleCBqdXN0aWZ5LWNvbnRlbnQtY2VudGVyIGFsaWduLWNvbnRlbnQtY2VudGVyIHVpLWNhcmRfX2hlYWRlclwiPlxuICA8aDE+TWljcm9zZW5zZSBVSSAtIEF2YWlsYWJsZSBSZWFkZXJzPC9oMT5cbjwvZGl2PlxuXG48aHI+XG5cbjxzY3JpcHQ+XG4gIGltcG9ydCBmb250YXdlc29tZSBmcm9tIFwiQGZvcnRhd2Vzb21lL2ZvbnRhd2Vzb21lXCI7XG4gIGltcG9ydCB7IGZhU2VhcmNoLCBmYVRpbWVzIH0gZnJvbSBcIkBmb3J0YXdlc29tZS9mb250YXdlc29tZS1mcmVlLXNvbGlkXCI7XG5cbiAgZm9udGF3ZXNvbWUubGlicmFyeS5hZGQoZmFTZWFyY2gsIGZhVGltZXMpO1xuXG4gIGV4cG9ydCBkZWZhdWx0IHtcbiAgICBtZXRob2RzOiB7XG4gICAgICBoYW5kbGVDaGFuZ2Uoc3RyID0gdW5kZWZpbmVkKSB7XG4gICAgICAgIGNvbnN0IGlucHV0ID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignLmNhcmQtaGVhZGVyX19pbnB1dCcpO1xuICAgICAgICBpZiAoc3RyID09PSAncmVzZXQnKSB7XG4gICAgICAgICAgaW5wdXQudmFsdWUgPSAnJztcbiAgICAgICAgfVxuICAgICAgICB0aGlzLnNldCh7XG4gICAgICAgICAgY2l0eTogaW5wdXQudmFsdWUuc3BsaXQoJywgJylbMF1cbiAgICAgICAgfSk7XG4gICAgICB9LFxuXG4gICAgfVxuICB9O1xuPC9zY3JpcHQ+XG5cbjxzdHlsZT5cbiAgLnVpLWNhcmRfX2hlYWRlciB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7XG4gICAgYm9yZGVyLWJvdHRvbTogbm9uZTtcbiAgICB6LWluZGV4OiA1MDA7XG4gIH1cblxuICAuY2FyZD5ociB7XG4gICAgbWFyZ2luOiAwIDFyZW07XG4gIH1cbjwvc3R5bGU+Il0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQTZCRSxnQkFBZ0IsY0FBQyxDQUFDLEFBQ2hCLGdCQUFnQixDQUFFLFdBQVcsQ0FDN0IsYUFBYSxDQUFFLElBQUksQ0FDbkIsT0FBTyxDQUFFLEdBQUcsQUFDZCxDQUFDLEFBRUQsS0FBSyxDQUFDLEVBQUUsY0FBQyxDQUFDLEFBQ1IsTUFBTSxDQUFFLENBQUMsQ0FBQyxJQUFJLEFBQ2hCLENBQUMifQ== */";
     append(document.head, style);
   }
 
@@ -2573,15 +2400,15 @@ var app = (function() {
       c: function create() {
         div = createElement("div");
         h1 = createElement("h1");
-        h1.textContent = "No Data";
+        h1.textContent = "Microsense UI - Available Readers";
         text_1 = createText("\n\n");
         hr = createElement("hr");
-        addLoc(h1, file, 2, 2, 102);
+        addLoc(h1, file, 1, 2, 101);
         div.className =
-          "card-header w-100 d-flex justify-content-center align-content-center ui-card__header svelte-uixapf";
+          "card-header w-100 d-flex justify-content-center align-content-center ui-card__header svelte-30j8po";
         addLoc(div, file, 0, 0, 0);
-        hr.className = "svelte-uixapf";
-        addLoc(hr, file, 7, 0, 129);
+        hr.className = "svelte-30j8po";
+        addLoc(hr, file, 4, 0, 152);
       },
 
       m: function mount(target, anchor) {
@@ -2613,7 +2440,7 @@ var app = (function() {
     this._state = assign({}, options.data);
     this._intro = true;
 
-    if (!document.getElementById("svelte-uixapf-style")) add_css();
+    if (!document.getElementById("svelte-30j8po-style")) add_css();
 
     this._fragment = create_main_fragment(this, this._state);
 
@@ -2634,40 +2461,28 @@ var app = (function() {
 
   /* src/components/views/CardBody.html generated by Svelte v2.16.1 */
 
+  function data() {
+    return {
+      readers: []
+    };
+  }
+  function oncreate() {
+    const { readers } = this.store.get();
+    this.set({
+      readers: readers
+    });
+    console.log("this: ", this);
+  }
   const file$1 = "src/components/views/CardBody.html";
 
   function create_main_fragment$1(component, ctx) {
-    var div1, div0, ul, li0, text1, li1, text3, li2, text5, li3, text7, li4;
+    var div1, div0, ul;
 
     return {
       c: function create() {
         div1 = createElement("div");
         div0 = createElement("div");
         ul = createElement("ul");
-        li0 = createElement("li");
-        li0.textContent = "Cras justo odio";
-        text1 = createText("\n      ");
-        li1 = createElement("li");
-        li1.textContent = "Dapibus ac facilisis in";
-        text3 = createText("\n      ");
-        li2 = createElement("li");
-        li2.textContent = "Morbi leo risus";
-        text5 = createText("\n      ");
-        li3 = createElement("li");
-        li3.textContent = "Porta ac consectetur ac";
-        text7 = createText("\n      ");
-        li4 = createElement("li");
-        li4.textContent = "Vestibulum at eros";
-        li0.className = "list-group-item";
-        addLoc(li0, file$1, 4, 6, 192);
-        li1.className = "list-group-item";
-        addLoc(li1, file$1, 5, 6, 247);
-        li2.className = "list-group-item";
-        addLoc(li2, file$1, 6, 6, 310);
-        li3.className = "list-group-item";
-        addLoc(li3, file$1, 7, 6, 365);
-        li4.className = "list-group-item";
-        addLoc(li4, file$1, 8, 6, 428);
         ul.className = "list-group";
         addLoc(ul, file$1, 3, 4, 162);
         div0.className = "d-flex flex-column card-content__data";
@@ -2681,15 +2496,6 @@ var app = (function() {
         insert(target, div1, anchor);
         append(div1, div0);
         append(div0, ul);
-        append(ul, li0);
-        append(ul, text1);
-        append(ul, li1);
-        append(ul, text3);
-        append(ul, li2);
-        append(ul, text5);
-        append(ul, li3);
-        append(ul, text7);
-        append(ul, li4);
       },
 
       p: noop,
@@ -2709,10 +2515,18 @@ var app = (function() {
     }
 
     init(this, options);
-    this._state = assign({}, options.data);
+    this._state = assign(data(), options.data);
     this._intro = true;
 
     this._fragment = create_main_fragment$1(this, this._state);
+
+    this.root._oncreate.push(() => {
+      oncreate.call(this);
+      this.fire("update", {
+        changed: assignTrue({}, this._state),
+        current: this._state
+      });
+    });
 
     if (options.target) {
       if (options.hydrate)
@@ -2721,6 +2535,8 @@ var app = (function() {
         );
       this._fragment.c();
       this._mount(options.target, options.anchor);
+
+      flush(this);
     }
   }
 
@@ -2730,7 +2546,7 @@ var app = (function() {
 
   /* src/App.html generated by Svelte v2.16.1 */
 
-  function data() {
+  function data$1() {
     return {
       weather: [],
       apiKey: ""
@@ -2836,7 +2652,7 @@ var app = (function() {
     }
 
     init(this, options);
-    this._state = assign(data(), options.data);
+    this._state = assign(data$1(), options.data);
     if (!("weather" in this._state))
       console.warn(
         "<App> was created without expected data property 'weather'"
@@ -2864,6 +2680,190 @@ var app = (function() {
 
   App.prototype._checkReadOnly = function _checkReadOnly(newState) {};
 
+  function Store(state, options) {
+    this._handlers = {};
+    this._dependents = [];
+
+    this._computed = blankObject();
+    this._sortedComputedProperties = [];
+
+    this._state = assign({}, state);
+    this._differs = options && options.immutable ? _differsImmutable : _differs;
+  }
+
+  assign(Store.prototype, {
+    _add(component, props) {
+      this._dependents.push({
+        component: component,
+        props: props
+      });
+    },
+
+    _init(props) {
+      const state = {};
+      for (let i = 0; i < props.length; i += 1) {
+        const prop = props[i];
+        state["$" + prop] = this._state[prop];
+      }
+      return state;
+    },
+
+    _remove(component) {
+      let i = this._dependents.length;
+      while (i--) {
+        if (this._dependents[i].component === component) {
+          this._dependents.splice(i, 1);
+          return;
+        }
+      }
+    },
+
+    _set(newState, changed) {
+      const previous = this._state;
+      this._state = assign(assign({}, previous), newState);
+
+      for (let i = 0; i < this._sortedComputedProperties.length; i += 1) {
+        this._sortedComputedProperties[i].update(this._state, changed);
+      }
+
+      this.fire("state", {
+        changed,
+        previous,
+        current: this._state
+      });
+
+      this._dependents
+        .filter(dependent => {
+          const componentState = {};
+          let dirty = false;
+
+          for (let j = 0; j < dependent.props.length; j += 1) {
+            const prop = dependent.props[j];
+            if (prop in changed) {
+              componentState["$" + prop] = this._state[prop];
+              dirty = true;
+            }
+          }
+
+          if (dirty) {
+            dependent.component._stage(componentState);
+            return true;
+          }
+        })
+        .forEach(dependent => {
+          dependent.component.set({});
+        });
+
+      this.fire("update", {
+        changed,
+        previous,
+        current: this._state
+      });
+    },
+
+    _sortComputedProperties() {
+      const computed = this._computed;
+      const sorted = (this._sortedComputedProperties = []);
+      const visited = blankObject();
+      let currentKey;
+
+      function visit(key) {
+        const c = computed[key];
+
+        if (c) {
+          c.deps.forEach(dep => {
+            if (dep === currentKey) {
+              throw new Error(
+                `Cyclical dependency detected between ${dep} <-> ${key}`
+              );
+            }
+
+            visit(dep);
+          });
+
+          if (!visited[key]) {
+            visited[key] = true;
+            sorted.push(c);
+          }
+        }
+      }
+
+      for (const key in this._computed) {
+        visit((currentKey = key));
+      }
+    },
+
+    compute(key, deps, fn) {
+      let value;
+
+      const c = {
+        deps,
+        update: (state, changed, dirty) => {
+          const values = deps.map(dep => {
+            if (dep in changed) dirty = true;
+            return state[dep];
+          });
+
+          if (dirty) {
+            const newValue = fn.apply(null, values);
+            if (this._differs(newValue, value)) {
+              value = newValue;
+              changed[key] = true;
+              state[key] = value;
+            }
+          }
+        }
+      };
+
+      this._computed[key] = c;
+      this._sortComputedProperties();
+
+      const state = assign({}, this._state);
+      const changed = {};
+      c.update(state, changed, true);
+      this._set(state, changed);
+    },
+
+    fire,
+
+    get,
+
+    on,
+
+    set(newState) {
+      const oldState = this._state;
+      const changed = (this._changed = {});
+      let dirty = false;
+
+      for (const key in newState) {
+        if (this._computed[key])
+          throw new Error(`'${key}' is a read-only computed property`);
+        if (this._differs(newState[key], oldState[key]))
+          changed[key] = dirty = true;
+      }
+      if (!dirty) return;
+
+      this._set(newState, changed);
+    }
+  });
+
+  const getEndpoints = {
+    readers: {
+      route: "api/readers",
+      method: "GET"
+    },
+    health: {
+      route: "api/health",
+      method: "GET"
+    },
+    operations: {
+      route: "api/operations",
+      method: "GET"
+    }
+  };
+
+  const apiHost = "http://localhost:3000";
+
   // Wrapper around fetch - allows for more flexibility
   const apiCall = async ({ route, method, payload = undefined }) => {
     const config = {
@@ -2881,7 +2881,7 @@ var app = (function() {
     }
 
     try {
-      return await fetch(`http://localhost:3000/${route}`, config)
+      return await fetch(`${apiHost}/${route}`, config)
         .then(res => res.json())
         .then(result => result);
     } catch (err) {
@@ -2889,22 +2889,7 @@ var app = (function() {
     }
   };
 
-  const getEndpoints = {
-    readers: {
-      route: "api/readers",
-      method: "GET"
-    },
-    health: {
-      route: "api/health",
-      method: "GET"
-    },
-    operations: {
-      route: "api/operations",
-      method: "GET"
-    }
-  };
-
-  // bootstrap the client application
+  // Svelte includes a lightweight state management implementation
 
   const store = new Store();
 
@@ -2920,11 +2905,14 @@ var app = (function() {
         health,
         operations
       });
-      // console.log('store: ', store)
+      // console.log('store get: ', store.get())
     } catch (err) {
       console.error(`Error getting initial data: ${err}`);
     }
   })();
+
+  // bootstrap the client application
+  console.log("store get: ", store);
 
   const app = new App({
     target: document.querySelector("#microsense-ui__wrapper"),
