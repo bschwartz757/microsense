@@ -1,24 +1,26 @@
 {
-  "name": "api",
+  "name": "client",
   "version": "1.0.0",
-  "description": "Mock api for ItemSense UI Team's take-home project",
+  "description": "Mock client application for ItemSense UI Team's take-home project",
   "license": "MIT",
   "author": "Blake Schwartz",
-  "main": "app/public/js/bundle.js",
-  "module": "app/public/js/bundle.es.js",
+  "main": "public/js/bundle.js",
+  "module": "public/js/bundle.es.js",
   "scripts": {
-    "build": "cd app && rollup -c",
-    "dev": "serve public & rollup -c -w",
-    "start": "npm run build && node server.js"
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "start": "nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm start\" \"npm run watch\""
   },
   "eslintConfig": {
-    "parser": "babel-eslint",
-    "extends": [],
+    "extends": "eslint:recommended",
     "env": {
-      "es6": true
+      "es6": true,
+      "browser": true
     },
     "plugins": [],
     "parserOptions": {
+      "ecmaVersion": 8,
       "sourceType": "module",
       "allowImportExportEverywhere": true
     },
@@ -32,13 +34,17 @@
     "> 1% in US"
   ],
   "devDependencies": {
+    "@fortawesome/fontawesome": "1.1.8",
+    "@fortawesome/fontawesome-free-solid": "5.0.13",
     "eslint-config-standard": "^12.0.0",
     "eslint-config-standard-react": "^7.0.2",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "node-sass": "4.11.0",
     "rollup": "^1.2.3",
+    "rollup-plugin-alias": "1.5.1",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-eslint": "^5.0.0",
     "rollup-plugin-node-resolve": "^4.0.1",
@@ -48,6 +54,10 @@
     "svelte": "^2.0.0"
   },
   "dependencies": {
-    "express": "^4.16.3"
+    "concurrently": "4.1.0",
+    "bootstrap": "4.3.1",
+    "eases-jsnext": "1.0.10",
+    "express": "^4.16.4",
+    "svelte-transitions": "1.2.0"
   }
 }

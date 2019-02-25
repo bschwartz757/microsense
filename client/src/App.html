@@ -1,9 +1,8 @@
-<main class="container">
-  <section class="col-12 d-flex justify-content-center">
-    <div class="card col-6 weather-app-card">
+<main class="microsense-ui__container col-12">
+  <section class="d-flex justify-content-center">
+    <div class="card col-8 microsense-ui__card">
       <CardHeader on:state="getWeather(event)" />
-      <CardBody current={weather}/>
-      <CardFooter forecast={weather}/>
+      <CardBody current={weather} />
     </div>
   </section>
 </main>
@@ -12,14 +11,13 @@
   .weather-app-card {
     color: white;
     background-color: rgba(74, 144, 226,
-    0.75);
+      0.75);
     box-shadow: 0 0 .75rem rgba(0, 0, 0, 0.5);
     padding: 0 0;
   }
 </style>
 
 <script>
-  import getWeatherByCity from './utils/getWeatherByCity';
 
   export default {
     data() {
@@ -31,7 +29,6 @@
     components: {
       CardHeader: './components/views/CardHeader.html',
       CardBody: './components/views/CardBody.html',
-      CardFooter: './components/views/CardFooter.html'
     },
     methods: {
       getWeather: async function (value) {

@@ -1,0 +1,36 @@
+<div class="card-body col-12 d-flex justify-content-center card-content">
+  <div class="d-flex flex-column card-content__data">
+    <!-- <h3>No Data</h3> -->
+    <ul class="list-group">
+      <li class="list-group-item">Cras justo odio</li>
+      <li class="list-group-item">Dapibus ac facilisis in</li>
+      <li class="list-group-item">Morbi leo risus</li>
+      <li class="list-group-item">Porta ac consectetur ac</li>
+      <li class="list-group-item">Vestibulum at eros</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  import { fade } from 'svelte-transitions';
+  import { cubicInOut } from 'eases-jsnext';
+
+  export default {
+    transitions: {
+      fade(node, { delay = 0, duration = 400 }) {
+        const o = +getComputedStyle(node).opacity;
+
+        return {
+          delay,
+          duration,
+          easing: cubicInOut,
+          css: t => `opacity: ${t * o}`
+        };
+      }
+    }
+  };
+</script>
+
+<style>
+
+</style>

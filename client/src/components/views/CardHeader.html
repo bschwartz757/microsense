@@ -1,18 +1,8 @@
-<div class="card-header w-100 d-flex justify-content-between align-items-center weather-app-card__header">
-  <div on:click="handleSearch()">
-    <i class="fas fa-search"></i>
-  </div>
-  <div class="w-75">
-    <form on:submit="handleSubmit(event)">
-      <div class="form-group">
-        <input type="text" class="form-control card-header__input" aria-describedby="searchHelp" on:change="handleChange()" placeholder="Search for a city...">
-        <small id="searchHelp" class="form-text text-muted" hidden>Please enter a city to search</small>
-      </div>
-    </form>
-  </div>
-  <div on:click="handleCancel()">
-    <i class="fas fa-times"></i>
-  </div>
+<div class="card-header w-100 d-flex justify-content-center align-content-center ui-card__header">
+
+  <h1>No Data</h1>
+
+
 </div>
 
 <hr>
@@ -50,7 +40,7 @@
 </script>
 
 <style>
-  .weather-app-card__header {
+  .ui-card__header {
     background-color: transparent;
     border-bottom: none;
     z-index: 500;

@@ -7,8 +7,7 @@ body {
 
 body {
   color: #333;
-  background: url("../img/cloud1.png"), url("../img/cloud2.png"),
-    linear-gradient(#367cd6, #183968);
+  background: linear-gradient(#367cd6, #183968);
   background-repeat: no-repeat;
   background-position: 30% 45%, 70% 40%;
   margin: 0;
