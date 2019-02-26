@@ -12,13 +12,12 @@ const store = new Store();
       Object.keys(getEndpoints).map(endpoint => apiCall(getEndpoints[endpoint]))
     );
     store.set({
-      readers,
-      health,
-      operations
+      readers: readers,
+      health: health,
+      operations: operations
     });
-    // console.log('store get: ', store.get())
   } catch (err) {
-    console.error(`Error getting initial data: ${err}`);
+    console.error(`Error getting data from server: ${err}`);
   }
 })();
 

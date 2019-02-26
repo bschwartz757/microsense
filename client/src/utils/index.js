@@ -17,10 +17,16 @@ const apiCall = async ({ route, method, payload = undefined }) => {
 
   try {
     return await fetch(`${apiHost}/${route}`, config)
-      .then(res => res.json())
-      .then(result => result);
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then(result => {
+        return result;
+      });
   } catch (err) {
-    console.log(`Error fetching data for route: ${route}, err: ${err}`);
+    throw new Error(`Error fetching data for route: ${route}, err: ${err}`);
   }
 };
 

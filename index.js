@@ -7,7 +7,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.set("port", process.env.PORT || 3000);
 
 app.use((req, res, next) => {
@@ -34,18 +34,19 @@ app.get("/api/operations", cors(), (req, res) => {
 });
 
 app.post("/api/jobs", cors(), (req, res) => {
+  console.log("req received: ", req.body);
   if (!req.body) return res.status(400).send("Empty Request");
 
   const operation = req.body.operation;
   const readers = req.body.readers;
 
-  if (!operation) return res.status(400).send("Missing Operation");
+  if (!operation) return res.status(400).json({ message: "Missing Operation" });
   if (!operations.includes(operation))
-    return res.status(400).send("Invalid Operation");
+    return res.status(400).json({ message: "Invalid Operation" });
   if (!(readers && readers.length))
-    return res.status(400).send("Missing Readers");
+    return res.status(400).json({ message: "Missing Readers" });
 
-  return res.sendStatus(200);
+  return res.status(200).json({ message: "success" });
 });
 
 //404 catch-all handler
