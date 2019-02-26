@@ -1,0 +1,24 @@
+// Import custom font from Google
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,600");
+
+$font-family-sans-serif: "Open Sans", sans-serif;
+$font-family-base: $font-family-sans-serif;
+$line-height-base: 1;
+$form-group-margin-bottom: 0;
+
+// @import "~bootstrap/scss/functions";
+// @import "~bootstrap/scss/variables";
+// @import "~bootstrap/scss/mixins";
+// @import "~bootstrap/scss/utilities";
+
+// @import "~bootstrap/scss/reboot";
+// @import "~bootstrap/scss/type";
+// @import "~bootstrap/scss/grid";
+// @import "~bootstrap/scss/card";
+// @import "~bootstrap/scss/forms";
+// @import "~bootstrap/scss/list-group";
+// @import "~bootstrap/scss/custom-forms";
+// @import "~bootstrap/scss/media";
+
+/* Alternatively import the whole thing */
+@import "~bootstrap/scss/bootstrap";

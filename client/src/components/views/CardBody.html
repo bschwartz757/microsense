@@ -1,0 +1,139 @@
+<div class="card-body col-12 d-flex justify-content-center card-content">
+  <div class="col-6 text-center card-content__data">
+    <h3>Available Readers</h3>
+    <div class="list-group list-group-flush">
+      {#each readerList as reader}
+        <a href="#" class="list-group-item list-group-item-action text-center" on:click="selectReader(reader)" class:active="selectedReaders.length && selectedReaders.filter(ind => ind.name === reader.name).length">
+          <strong>Reader:</strong> {reader.name} - <strong>Status:</strong> {reader.status}
+        </a>
+      {:else}
+        <li class="list-group-item">No readers found</li>
+      {/each}
+      </div>
+  </div>
+  <div class="col-6 text-center card-content__actions">
+    <h3>Available Operations</h3>
+    <div class="list-group list-group-flush">
+      {#each operations as operation}
+        <button type="button" class="list-group-item list-group-item-action text-center" on:click="selectOperation(operation)" class:active="selectedOperation && selectedOperation === operation" disabled={errorStatusSelected}>
+          <strong>{operation}</strong>
+        </button>
+      {:else}
+        <li class="list-group-item">No operations available</li>
+      {/each}
+    </div>
+    <div class="col-12 p-3">
+      <button type="button" class="btn btn-primary" on:click="setSubmitting()" disabled={errorStatusSelected || !selectedOperation || submitting}>Start Job</button>
+      {#if errorStatusSelected}
+      <div class="alert alert-danger m-3" role="alert">
+        Cannot start job with a reader in 'Error' status
+      </div>
+    {/if}
+      {#if warningStatusSelected && !submitting}
+      <div class="alert alert-warning m-3" role="alert">
+        A selected reader may have limited connectivity
+      </div>
+    {/if}
+    {#if submitting}
+      <div class="alert alert-info m-3" role="alert">
+        Job Submitted
+      </div>
+    {/if}
+    {#if success}
+      <div class="alert alert-success m-3" role="alert">
+        Job started successfully!
+      </div>
+    {/if}     
+    </div>
+  </div>
+</div>  
+
+<script>
+
+  import apiCall from '../../utils';
+  import { postEndpoints } from '../../config'
+
+  export default {
+    data() {
+      return {
+        readers: [],
+        health: [],
+        operations: [],
+        selectedReaders: [],
+        selectedOperation: null,
+        submitting: false,
+        success: false
+      }
+    },
+    computed: {
+      readerList: ({ readers, health }) => {
+        return readers.map(el => {
+          const { status, message } = health.find(ind => ind.reader === el.name) || { status: 'OK', message: 'Stable connection' }
+          return {
+            name: el.name,
+            type: el.type,
+            address: el.address,
+            status: status,
+            message: message
+          }
+        })
+      },
+      errorStatusSelected: ({ selectedReaders }) => {
+        return selectedReaders.length && selectedReaders.filter(reader => reader.status === "ERROR").length
+      },
+      warningStatusSelected: ({ selectedReaders }) => {
+        return selectedReaders.length && selectedReaders.filter(reader => reader.status === "WARNING").length
+      },
+    },
+    oncreate() {
+      this.store.on('state', ({ current: { readers, health, operations } }) => {
+        this.set({
+          readers: readers,
+          health: health,
+          operations: operations
+        })
+      });
+    },
+    methods: {
+      selectReader(reader) {
+        const { selectedReaders } = this.get()
+        const found = selectedReaders.findIndex(el => el.name === reader.name)
+        if (found !== -1) {
+          selectedReaders.splice(found, 1)
+        } else {
+          selectedReaders.push(reader)
+        }
+        this.set({
+          selectedReaders: selectedReaders
+        })
+      },
+      selectOperation(operation) {
+        this.set({
+          selectedOperation: operation
+        })
+      },
+      setSubmitting() {
+        this.set({
+          submitting: true
+        })
+        const { selectedReaders, selectedOperation } = this.get()
+        const { jobs: { ...params } } = postEndpoints
+        params.payload = {
+          operation: selectedOperation,
+          readers: selectedReaders.map(reader => reader.name)
+        }
+
+        apiCall(params)
+          .then(result => {
+            this.set({
+              selectedReaders: [],
+              selectedOperation: null,
+              submitting: false,
+              success: true
+            })
+            setTimeout(() => this.set({ success: false }), 2000)
+          })
+      }
+    }
+  };
+</script>
