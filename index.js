@@ -7,7 +7,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("port", process.env.PORT || 3000);
 
 app.use((req, res, next) => {
@@ -34,7 +34,6 @@ app.get("/api/operations", cors(), (req, res) => {
 });
 
 app.post("/api/jobs", cors(), (req, res) => {
-  console.log("req received: ", req.body);
   if (!req.body) return res.status(400).send("Empty Request");
 
   const operation = req.body.operation;

@@ -2473,30 +2473,6 @@ var app = (function() {
 
   CardHeader.prototype._checkReadOnly = function _checkReadOnly(newState) {};
 
-  const getEndpoints = {
-    readers: {
-      route: "api/readers",
-      method: "GET"
-    },
-    health: {
-      route: "api/health",
-      method: "GET"
-    },
-    operations: {
-      route: "api/operations",
-      method: "GET"
-    }
-  };
-
-  const postEndpoints = {
-    jobs: {
-      route: "api/jobs",
-      method: "POST"
-    }
-  };
-
-  const apiHost = "http://localhost:3000";
-
   // Wrapper around fetch - allows for more flexibility
   const apiCall = async ({ route, method, payload = undefined }) => {
     const config = {
@@ -2514,7 +2490,7 @@ var app = (function() {
     }
 
     try {
-      return await fetch(`${apiHost}/${route}`, config)
+      return await fetch(`${route}`, config)
         .then(res => {
           if (res.ok) {
             return res.json();
@@ -2525,6 +2501,28 @@ var app = (function() {
         });
     } catch (err) {
       throw new Error(`Error fetching data for route: ${route}, err: ${err}`);
+    }
+  };
+
+  const getEndpoints = {
+    readers: {
+      route: "/api/readers",
+      method: "GET"
+    },
+    health: {
+      route: "/api/health",
+      method: "GET"
+    },
+    operations: {
+      route: "/api/operations",
+      method: "GET"
+    }
+  };
+
+  const postEndpoints = {
+    jobs: {
+      route: "/api/jobs",
+      method: "POST"
     }
   };
 

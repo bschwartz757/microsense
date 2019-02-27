@@ -1,7 +1,12 @@
 const express = require("express");
+var proxy = require("http-proxy-middleware");
+
+const pkg = require("./package.json");
+
 const app = express();
 
 app.set("port", process.env.PORT || 8080);
+app.use("/api", proxy({ target: pkg.proxy }));
 app.use(express.static(`${__dirname}/public`));
 
 //Public Routes
